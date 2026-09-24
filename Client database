@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin System - NAOKI ARVINO PHOTOGRAPHY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --yellow-main: #f0b429;
+      --yellow-dark: #d99b1c;
+      --dark-bg: #1c1d21;
+      --text-dark: #1e293b;
+      --border-color: #e2e8f0;
+      --booked-color: #10b981; /* Warna hijau indikator terisi */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .main-container {
+      max-width: 1300px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 25px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Form Panel Left */
+    .form-panel {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .form-header {
+      margin-bottom: 18px;
+      border-bottom: 2px solid var(--yellow-main);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-header h2 {
+      font-size: 1.1rem;
+      color: var(--yellow-main);
+      letter-spacing: 1px;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin: 14px 0 8px 0;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .year-month-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .year-input {
+      width: 110px;
+      padding: 8px 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: var(--yellow-main);
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .btn-month {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 8px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .btn-month:hover, .btn-month.active {
+      background: var(--yellow-main);
+      color: #000;
+      border-color: var(--yellow-main);
+      font-weight: 700;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .day-name {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--yellow-main);
+      padding-bottom: 4px;
+    }
+
+    .day-btn {
+      aspect-ratio: 1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .day-btn:hover {
+      border-color: var(--yellow-main);
+      color: var(--yellow-main);
+    }
+
+    .day-btn.active {
+      background: var(--yellow-main) !important;
+      color: #000 !important;
+      font-weight: 800;
+    }
+
+    .day-btn.has-booking {
+      border: 1px solid var(--yellow-main);
+      background: #332a15;
+      color: var(--yellow-main);
+      font-weight: 700;
+    }
+
+    .day-btn.has-booking::after {
+      content: '•';
+      position: absolute;
+      bottom: 2px;
+      font-size: 14px;
+      color: var(--yellow-main);
+    }
+
+    .day-btn.empty {
+      visibility: hidden;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 9px 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--yellow-main);
+    }
+
+    .status-badge-info {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #334155;
+      color: #cbd5e1;
+    }
+
+    .btn-action-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-submit {
+      flex: 2;
+      background: var(--yellow-main);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: var(--yellow-dark);
+    }
+
+    .btn-delete {
+      flex: 1;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .btn-delete:hover {
+      background: #dc2626;
+    }
+
+    .backup-tools {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px dashed #334155;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .btn-tool {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      cursor: pointer;
+    }
+
+    .btn-tool:hover {
+      color: #fff;
+      border-color: #64748b;
+    }
+
+    /* Preview Panel / Invoice Design */
+    .preview-panel {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Printable Invoice Sheet */
+    .invoice-sheet {
+      width: 100%;
+      max-width: 760px;
+      background: #ffffff;
+      color: var(--text-dark);
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top Invoice Header */
+    .inv-header {
+      display: flex;
+      position: relative;
+      min-height: 150px;
+    }
+
+    .inv-header-left {
+      background: var(--dark-bg);
+      color: #fff;
+      width: 60%;
+      padding: 20px 20px 20px 25px;
+      clip-path: polygon(0 0, 100% 0, 86% 100%, 0 100%);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+    }
+
+    .inv-header-left .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* LOGO EXACT VECTOR REPLICA */
+    .inv-header-left .exact-logo-svg {
+      width: 68px;
+      height: 78px;
+      flex-shrink: 0;
+    }
+
+    .inv-header-left .brand-title-main {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 1.5px;
+      color: var(--yellow-main);
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .inv-header-left .brand-sub {
+      font-size: 0.6rem;
+      color: #94a3b8;
+      letter-spacing: 3px;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .inv-header-left .brand-tags {
+      font-size: 0.5rem;
+      color: #cbd5e1;
+      margin-top: 5px;
+      letter-spacing: 0.5px;
+      word-spacing: 1px;
+    }
+
+    .inv-header-right {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 48%;
+      height: 100%;
+      background: var(--yellow-main);
+      padding: 25px 25px 25px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
+      z-index: 1;
+    }
+
+    .inv-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--dark-bg);
+      letter-spacing: 2px;
+    }
+
+    .inv-number-date {
+      font-size: 0.7rem;
+      color: #334155;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* Client Info Strip */
+    .client-info-strip {
+      padding: 20px 30px 10px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .client-to {
+      font-size: 0.75rem;
+    }
+
+    .client-to span {
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .client-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--dark-bg);
+    }
+
+    .client-details {
+      font-size: 0.75rem;
+      color: #475569;
+      margin-top: 3px;
+    }
+
+    .invoice-total-badge {
+      background: var(--yellow-main);
+      padding: 10px 18px;
+      border-radius: 4px;
+      text-align: right;
+    }
+
+    .invoice-total-badge span {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--dark-bg);
+    }
+
+    .invoice-total-badge h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--dark-bg);
+    }
+
+    /* Table Design */
+    .table-container {
+      padding: 10px 30px;
+    }
+
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .inv-table th {
+      background: var(--dark-bg);
+      color: #fff;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      text-align: left;
+      letter-spacing: 0.5px;
+    }
+
+    .inv-table th:last-child, .inv-table td:last-child {
+      text-align: right;
+    }
+
+    .inv-table td {
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--dark-bg);
+    }
+
+    .inv-table td strong {
+      font-weight: 700;
+      display: block;
+    }
+
+    .inv-table td small {
+      color: #64748b;
+      font-size: 0.7rem;
+    }
+
+    /* Calculation Row */
+    .inv-summary {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 30px;
+      gap: 20px;
+    }
+
+    .inv-summary-left {
+      width: 58%;
+    }
+
+    .inv-summary-right {
+      width: 38%;
+    }
+
+    .summary-box {
+      font-size: 0.73rem;
+    }
+
+    .summary-title {
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--dark-bg);
+      font-size: 0.7rem;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-text {
+      color: #475569;
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 0.75rem;
+      color: #475569;
+    }
+
+    .calc-row.total {
+      background: var(--yellow-main);
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-weight: 800;
+      color: var(--dark-bg);
+      margin-top: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* Thank You Banner */
+    .thankyou-banner {
+      background: #fef9c3;
+      border-left: 4px solid var(--yellow-main);
+      margin: 5px 30px 15px 30px;
+      padding: 10px 14px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .thankyou-banner p {
+      font-size: 0.72rem;
+      color: #713f12;
+      font-weight: 600;
+      font-style: italic;
+    }
+
+    /* Signature & Bank */
+    .inv-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 5px 30px 20px 30px;
+    }
+
+    .payment-info {
+      font-size: 0.72rem;
+      color: #475569;
+    }
+
+    .signature-block {
+      text-align: center;
+      width: 140px;
+    }
+
+    .signature-space {
+      height: 40px;
+      border-bottom: 1px solid #cbd5e1;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: var(--dark-bg);
+      font-weight: bold;
+    }
+
+    .signature-block span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--dark-bg);
+      display: block;
+    }
+
+    /* Invoice Footer */
+    .inv-footer {
+      background: var(--dark-bg);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 30px;
+      font-size: 0.65rem;
+      position: relative;
+    }
+
+    .inv-footer::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 30px;
+      width: 60px;
+      height: 6px;
+      background: var(--yellow-main);
+    }
+
+    .inv-footer div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-pdf {
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-pdf:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+  
+  <!-- PANEL KIRI: FORM & KALENDER ADMIN -->
+  <div class="form-panel">
+    <div class="form-header">
+      <div>
+        <h2>NAOKI ARVINO</h2>
+        <p style="font-size: 0.72rem; color: #94a3b8;">Admin Scheduling & Client Database</p>
+      </div>
+      <span class="status-badge-info" id="dbCount">0 Booking</span>
+    </div>
+
+    <!-- Pilih Tahun & Bulan -->
+    <div class="section-title">
+      <span><i class="fa-solid fa-calendar-days"></i> 1. Tahun & Bulan</span>
+    </div>
+    <div class="year-month-box">
+      <input type="number" id="yearInput" class="year-input" value="2026" min="2024" max="2035" onchange="renderCalendar()">
+      <div style="font-size: 0.72rem; color: #94a3b8;">← Tulis tahun bebas</div>
+    </div>
+
+    <div class="month-grid" id="monthGrid"></div>
+
+    <!-- Grid Kalender -->
+    <div class="section-title">
+      <span><i class="fa-solid fa-calendar-day"></i> 2. Tanggal Acara</span>
+      <small style="color:var(--yellow-main); text-transform:none; font-weight:normal;">• Emas = Terisi</small>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+
+    <!-- Form Data Client -->
+    <div class="section-title">
+      <span><i class="fa-solid fa-user-pen"></i> 3. Detail Booking Client</span>
+    </div>
+    
+    <form id="bookingForm" onsubmit="event.preventDefault(); saveBooking();">
+      <div class="input-group">
+        <label>Tanggal Terpilih</label>
+        <input type="text" id="selectedDate" readonly placeholder="Klik tanggal di kalender..." required style="color:var(--yellow-main); font-weight:700;">
+      </div>
+
+      <div class="input-group">
+        <label>Nama Client / Pengantin</label>
+        <input type="text" id="clientName" placeholder="Contoh: Rian & Maia" required>
+      </div>
+
+      <div class="input-group">
+        <label>Lokasi / Alamat Acara</label>
+        <input type="text" id="address" placeholder="Contoh: Gedung Serbaguna, Demak" required>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div class="input-group" style="flex:1;">
+          <label>Jam Acara</label>
+          <input type="time" id="eventTime" required>
+        </div>
+        <div class="input-group" style="flex:1;">
+          <label>MUA / Perias</label>
+          <input type="text" id="mua" placeholder="Contoh: Gallery MUA" required>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Package Description</label>
+        <input type="text" id="package" placeholder="Contoh: Paket Wedding Exclusive + Videography 4K" required>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div class="input-group" style="flex:1;">
+          <label>Total Price (Rp)</label>
+          <input type="text" id="totalPrice" placeholder="5.000.000" onkeyup="formatInputRupiah(this)" required>
+        </div>
+        <div class="input-group" style="flex:1;">
+          <label>Down Payment / DP (Rp)</label>
+          <input type="text" id="dpAmount" placeholder="1.000.000" onkeyup="formatInputRupiah(this)" required>
+        </div>
+      </div>
+
+      <div class="btn-action-group">
+        <button type="submit" class="btn-submit">
+          <i class="fa-solid fa-floppy-disk"></i> SIMPAN & UPDATE INVOICE
+        </button>
+        <button type="button" class="btn-delete" onclick="deleteCurrentBooking()">
+          <i class="fa-solid fa-trash"></i> Hapus
+        </button>
+      </div>
+    </form>
+
+    <!-- Backup & Restore Data -->
+    <div class="backup-tools">
+      <button class="btn-tool" onclick="exportData()"><i class="fa-solid fa-download"></i> Backup Data (JSON)</button>
+      <button class="btn-tool" onclick="document.getElementById('importFile').click()"><i class="fa-solid fa-upload"></i> Restore Data</button>
+      <input type="file" id="importFile" style="display:none;" onchange="importData(event)">
+    </div>
+
+  </div>
+
+  <!-- PANEL KANAN: PREVIEW INVOICE -->
+  <div class="preview-panel">
+    <div class="section-title" style="margin-top:0; margin-bottom: 12px; color:#fff;">
+      <i class="fa-solid fa-eye"></i> Tampilan Invoice Penjadwalan
+    </div>
+
+    <!-- Lembar Invoice Printable -->
+    <div id="invoiceArea" class="invoice-sheet">
+      
+      <!-- Top Invoice Header -->
+      <div class="inv-header">
+        <div class="inv-header-left">
+          <div class="logo-box">
+            
+            <!-- LOGO VEKTOR PRESISI TINGGI (NAOKI ARVINO PHOTOGRAPHY) -->
+            <svg class="exact-logo-svg" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Crown Base Glow / Shading -->
+              <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f5d061"/>
+                  <stop offset="50%" stop-color="#d4af37"/>
+                  <stop offset="100%" stop-color="#9a7b1c"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Crown Base Structure -->
+              <path d="M 40 70 C 40 70, 70 95, 100 95 C 130 95, 160 70, 160 70 L 180 25 L 140 45 L 100 10 L 60 45 L 20 25 Z" fill="url(#goldGrad)" />
+              
+              <!-- Crown Balls/Circles Top -->
+              <circle cx="100" cy="10" r="7" fill="url(#goldGrad)" />
+              <circle cx="20" cy="25" r="6" fill="url(#goldGrad)" />
+              <circle cx="180" cy="25" r="6" fill="url(#goldGrad)" />
+
+              <!-- Crown Bottom Rim & Small Circles (5 Dots) -->
+              <path d="M 42 74 C 70 96, 130 96, 158 74" stroke="#1c1d21" stroke-width="3" fill="none"/>
+              <circle cx="60" cy="74" r="3" fill="#1c1d21"/>
+              <circle cx="80" cy="80" r="3" fill="#1c1d21"/>
+              <circle cx="100" cy="82" r="3.5" fill="#1c1d21"/>
+              <circle cx="120" cy="80" r="3" fill="#1c1d21"/>
+              <circle cx="140" cy="74" r="3" fill="#1c1d21"/>
+
+              <!-- Monogram NA Vector -->
+              <!-- N Letter Left side -->
+              <path d="M 60 105 L 60 160 M 60 105 L 100 160 M 100 105 L 100 160" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="square"/>
+              <!-- A Letter Right Overlay -->
+              <path d="M 100 160 L 122 120 L 140 160 M 110 145 L 132 145" stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="square"/>
+
+              <!-- Inverted Triangle Bottom -->
+              <polygon points="68,172 132,172 100,215" fill="url(#goldGrad)" />
+
+              <!-- Crescent Shield (Outer Shield Arch) -->
+              <path d="M 15 65 C 5 130, 45 225, 100 235 C 155 225, 195 130, 185 65" stroke="url(#goldGrad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </svg>
+
+            <div>
+              <div class="brand-title-main">Naoki Arvino</div>
+              <div class="brand-sub">PHOTOGRAPHY</div>
+              <div class="brand-tags">Wedding | Prewedding | Engagement | Event | Party</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-header-right">
+          <div class="inv-title">INVOICE</div>
+          <div class="inv-number-date" id="outInvNumDate">INV/NAP/2026/001 | 25 SEP 2026</div>
+        </div>
+      </div>
+
+      <!-- Client Info Strip -->
+      <div class="client-info-strip">
+        <div class="client-to">
+          <span>SCHEDULED FOR:</span>
+          <div class="client-name" id="outClient">Rian & Maia</div>
+          <div class="client-details" id="outAddress">Alamat Acara: Gedung Serbaguna, Demak</div>
+          <div class="client-details" id="outTimeMua">Jam: 08:00 WIB | MUA: Gallery MUA</div>
+        </div>
+
+        <div class="invoice-total-badge">
+          <span>TOTAL COST</span>
+          <h3 id="outTotalBadge">Rp 5.000.000</h3>
+        </div>
+      </div>
+
+      <!-- Table Services -->
+      <div class="table-container">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th style="width: 8%;">NO</th>
+              <th style="width: 52%;">DESCRIPTION</th>
+              <th style="width: 10%; text-align:center;">QTY</th>
+              <th style="width: 15%; text-align:right;">PRICE</th>
+              <th style="width: 15%;">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:center;">01</td>
+              <td>
+                <strong id="outPackageName">Paket Wedding Exclusive + Videography 4K</strong>
+                <small id="outEventDateDetail">Tanggal Acara: 25 September 2026</small>
+              </td>
+              <td style="text-align:center;">1</td>
+              <td id="outPrice">Rp 5.000.000</td>
+              <td id="outRowTotal">Rp 5.000.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Calculation & Terms Summary -->
+      <div class="inv-summary">
+        <div class="inv-summary-left">
+          <div class="summary-box">
+            <div class="summary-title"><i class="fa-solid fa-shield-halved" style="color:var(--yellow-main)"></i> TERMS & CANCELLATION POLICY</div>
+            <div class="summary-text">
+              • Sistem kami memprioritaskan momen istimewa Anda dengan langsung mengunci tanggal acara secara eksklusif.<br>
+              • Oleh karena itu, <strong>Down Payment (DP) yang telah dibayarkan bersifat non-refundable (tidak dapat dikembalikan/hangus)</strong> apabila terjadi pembatalan sepihak.<br>
+              • Pelunasan sisa pembayaran wajib dilakukan maksimal H-1 atau pada hari H acara.
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-summary-right">
+          <div class="calc-row">
+            <span>Sub Total</span>
+            <span id="outSubTotal">Rp 5.000.000</span>
+          </div>
+          <div class="calc-row">
+            <span>DP / Down Payment</span>
+            <span id="outDp">Rp 1.000.000</span>
+          </div>
+          <div class="calc-row total">
+            <span>TOTAL DUE (SISA)</span>
+            <span id="outTotalDue">Rp 4.000.000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thank You Message Banner -->
+      <div class="thankyou-banner">
+        <p><i class="fa-solid fa-heart" style="color:#e11d48"></i> "Terima kasih telah mempercayakan momen spesial Anda kepada NAOKI ARVINO PHOTOGRAPHY. Kami siap mengabadikan setiap detik berharga Anda dengan karya terbaik."</p>
+      </div>
+
+      <!-- Payment & Signature Strip -->
+      <div class="inv-bottom">
+        <div class="payment-info">
+          <div class="summary-title">PAYMENT METHOD</div>
+          <div>Bank Transfer: <strong>BCA</strong></div>
+          <div>No. Rekening: <strong>0810985372</strong></div>
+          <div>A/N: <strong>NAOKI ARVINO</strong></div>
+        </div>
+
+        <div class="signature-block">
+          <div class="signature-space">NAP Studio</div>
+          <span>Authorized Signature</span>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="inv-footer">
+        <div><i class="fa-brands fa-instagram"></i> @naokiarvinophotographi</div>
+        <div><i class="fa-solid fa-envelope"></i> naokiarvinophotography@gmail.com</div>
+        <div><i class="fa-solid fa-phone"></i> 082116046404</div>
+      </div>
+
+    </div>
+
+    <!-- Export PDF Button -->
+    <button type="button" class="btn-pdf" onclick="downloadInvoicePDF()">
+      <i class="fa-solid fa-file-pdf"></i> CETAK / DOWNLOAD INVOICE PDF
+    </button>
+  </div>
+
+</div>
+
+<script>
+  const months = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+
+  let selectedMonth = 8; // Default September
+  let selectedFullDateKey = ""; // Format Unique Key: YYYY-MM-DD
+
+  // LocalStorage Database
+  let bookingDatabase = JSON.parse(localStorage.getItem('NAP_BOOKINGS_DB')) || {};
+
+  // Render Month Buttons
+  const monthGrid = document.getElementById('monthGrid');
+  months.forEach((m, idx) => {
+    const btn = document.createElement('div');
+    btn.className = `btn-month ${idx === selectedMonth ? 'active' : ''}`;
+    btn.innerText = m.substring(0, 3);
+    btn.onclick = () => selectMonth(idx);
+    monthGrid.appendChild(btn);
+  });
+
+  function selectMonth(idx) {
+    selectedMonth = idx;
+    document.querySelectorAll('.btn-month').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+    renderCalendar();
+  }
+
+  // Render Kalender & Tampilkan Indikator Booking
+  function renderCalendar() {
+    const year = parseInt(document.getElementById('yearInput').value) || 2026;
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    const dayHeaders = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+    dayHeaders.forEach(d => {
+      const h = document.createElement('div');
+      h.className = 'day-name';
+      h.innerText = d;
+      grid.appendChild(h);
+    });
+
+    const firstDay = new Date(year, selectedMonth, 1).getDay();
+    const totalDays = new Date(year, selectedMonth + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'day-btn empty';
+      grid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const btn = document.createElement('button');
+      btn.className = 'day-btn';
+      btn.innerText = day;
+
+      const dateKey = `${year}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      // Jika tanggal sudah dibooking
+      if (bookingDatabase[dateKey]) {
+        btn.classList.add('has-booking');
+      }
+
+      if (dateKey === selectedFullDateKey) {
+        btn.classList.add('active');
+      }
+
+      btn.onclick = () => pickDate(day, year, dateKey, btn);
+      grid.appendChild(btn);
+    }
+
+    updateDatabaseCounter();
+  }
+
+  // Klik Tanggal -> Otomatis Load Data Jika Ada
+  function pickDate(day, year, dateKey, btnElement) {
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+    
+    selectedFullDateKey = dateKey;
+    const formattedText = `${day} ${months[selectedMonth]} ${year}`;
+    document.getElementById('selectedDate').value = formattedText;
+
+    // OTOMATIS POPULATE FORM JIKA TANGGAL TERSEBUT SUDAH TERISI DATA
+    if (bookingDatabase[dateKey]) {
+      const data = bookingDatabase[dateKey];
+      document.getElementById('clientName').value = data.clientName || '';
+      document.getElementById('address').value = data.address || '';
+      document.getElementById('eventTime').value = data.eventTime || '';
+      document.getElementById('mua').value = data.mua || '';
+      document.getElementById('package').value = data.package || '';
+      document.getElementById('totalPrice').value = formatRupiah(data.totalPrice);
+      document.getElementById('dpAmount').value = formatRupiah(data.dpAmount);
+    } else {
+      // Reset Form jika tanggal masih kosong
+      document.getElementById('clientName').value = '';
+      document.getElementById('address').value = '';
+      document.getElementById('eventTime').value = '';
+      document.getElementById('mua').value = '';
+      document.getElementById('package').value = '';
+      document.getElementById('totalPrice').value = '';
+      document.getElementById('dpAmount').value = '';
+    }
+
+    updateInvoiceView();
+  }
+
+  // Simpan Booking ke LocalStorage
+  function saveBooking() {
+    if (!selectedFullDateKey) {
+      alert("Pilih tanggal di kalender terlebih dahulu!");
+      return;
+    }
+
+    const dataObj = {
+      dateKey: selectedFullDateKey,
+      dateFormatted: document.getElementById('selectedDate').value,
+      clientName: document.getElementById('clientName').value,
+      address: document.getElementById('address').value,
+      eventTime: document.getElementById('eventTime').value,
+      mua: document.getElementById('mua').value,
+      package: document.getElementById('package').value,
+      totalPrice: parseNumber(document.getElementById('totalPrice').value),
+      dpAmount: parseNumber(document.getElementById('dpAmount').value)
+    };
+
+    // Simpan ke Object Database Local
+    bookingDatabase[selectedFullDateKey] = dataObj;
+    localStorage.setItem('NAP_BOOKINGS_DB', JSON.stringify(bookingDatabase));
+
+    renderCalendar();
+    updateInvoiceView();
+    alert("Data booking tanggal " + dataObj.dateFormatted + " berhasil tersimpan!");
+  }
+
+  // Hapus Booking Tanggal Terpilih
+  function deleteCurrentBooking() {
+    if (!selectedFullDateKey || !bookingDatabase[selectedFullDateKey]) {
+      alert("Tidak ada data booking pada tanggal ini untuk dihapus.");
+      return;
+    }
+
+    if (confirm("Apakah Anda yakin ingin menghapus jadwal booking pada tanggal ini?")) {
+      delete bookingDatabase[selectedFullDateKey];
+      localStorage.setItem('NAP_BOOKINGS_DB', JSON.stringify(bookingDatabase));
+      
+      // Reset Form
+      document.getElementById('clientName').value = '';
+      document.getElementById('address').value = '';
+      document.getElementById('eventTime').value = '';
+      document.getElementById('mua').value = '';
+      document.getElementById('package').value = '';
+      document.getElementById('totalPrice').value = '';
+      document.getElementById('dpAmount').value = '';
+
+      renderCalendar();
+      updateInvoiceView();
+      alert("Jadwal booking berhasil dihapus.");
+    }
+  }
+
+  // Update Tampilan Invoice
+  function updateInvoiceView() {
+    const dateStr = document.getElementById('selectedDate').value || '25 September 2026';
+    const client = document.getElementById('clientName').value || 'Rian & Maia';
+    const address = document.getElementById('address').value || 'Gedung Serbaguna, Demak';
+    const time = document.getElementById('eventTime').value || '08:00';
+    const mua = document.getElementById('mua').value || 'Gallery MUA';
+    const pkg = document.getElementById('package').value || 'Paket Wedding Exclusive + Videography 4K';
+    
+    const totalNum = parseNumber(document.getElementById('totalPrice').value) || 5000000;
+    const dpNum = parseNumber(document.getElementById('dpAmount').value) || 1000000;
+    const dueNum = totalNum - dpNum;
+
+    document.getElementById('outClient').innerText = client;
+    document.getElementById('outAddress').innerText = "Alamat Acara: " + address;
+    document.getElementById('outTimeMua').innerText = `Jam: ${time} WIB | MUA: ${mua}`;
+    
+    document.getElementById('outPackageName').innerText = pkg;
+    document.getElementById('outEventDateDetail').innerText = "Tanggal Acara: " + dateStr;
+    
+    document.getElementById('outTotalBadge').innerText = formatRupiah(totalNum);
+    document.getElementById('outPrice').innerText = formatRupiah(totalNum);
+    document.getElementById('outRowTotal').innerText = formatRupiah(totalNum);
+    document.getElementById('outSubTotal').innerText = formatRupiah(totalNum);
+    document.getElementById('outDp').innerText = formatRupiah(dpNum);
+    document.getElementById('outTotalDue').innerText = formatRupiah(dueNum);
+
+    const yearVal = document.getElementById('yearInput').value;
+    document.getElementById('outInvNumDate').innerText = `INV/NAP/${yearVal}/001 | ${dateStr.toUpperCase()}`;
+  }
+
+  // Helper Rupiah Format
+  function formatInputRupiah(input) {
+    let val = parseNumber(input.value);
+    input.value = val ? val.toLocaleString('id-ID') : '';
+    updateInvoiceView();
+  }
+
+  function formatRupiah(val) {
+    if (!val) return "Rp 0";
+    return "Rp " + parseInt(val, 10).toLocaleString('id-ID');
+  }
+
+  function parseNumber(val) {
+    if (!val) return 0;
+    let clean = val.toString().replace(/[^0-9]/g, '');
+    return parseInt(clean, 10) || 0;
+  }
+
+  function updateDatabaseCounter() {
+    const count = Object.keys(bookingDatabase).length;
+    document.getElementById('dbCount').innerText = `${count} Jadwal Terisi`;
+  }
+
+  // Backup Data JSON
+  function exportData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bookingDatabase, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `Backup_Booking_NAP_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  }
+
+  // Restore Data JSON
+  function importData(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(e) {
+      try {
+        const importedObj = JSON.parse(e.target.result);
+        bookingDatabase = { ...bookingDatabase, ...importedObj };
+        localStorage.setItem('NAP_BOOKINGS_DB', JSON.stringify(bookingDatabase));
+        renderCalendar();
+        alert("Data booking berhasil dipulihkan/diimpor!");
+      } catch (err) {
+        alert("File JSON tidak valid!");
+      }
+    };
+    fileReader.readAsText(event.target.files[0]);
+  }
+
+  // Download PDF
+  function downloadInvoicePDF() {
+    const element = document.getElementById('invoiceArea');
+    const client = document.getElementById('clientName').value || 'Client';
+
+    const opt = {
+      margin: 5,
+      filename: `Invoice_NAP_${client.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+  }
+
+  // Init
+  renderCalendar();
+  updateInvoiceView();
+</script>
+
+</body>
+</html>
